@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quiz/questions.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
 
 import 'quiz_brain.dart';
 
@@ -9,6 +10,8 @@ QuizBrain quizBrain = new QuizBrain();
 void main() {
   runApp(Quizzler());
 }
+
+
 
 class Quizzler extends StatelessWidget {
   @override
@@ -43,15 +46,52 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
 
+  List<bool> answer = [false, true, true];
+
+  List<Icon> scoreKeeper = [
+
+
+  ];
 
 
 
-  List<bool> answere = [false, true, true];
+  void checkAnswer(bool userPickedAnswer)
+  {
 
-  List<Icon> scoreKeeper = [];
+    bool correctAnswer = quizBrain.getQuestionAnswer();
+    setState(()
+    {
+
+      if(quizBrain.isFinished()==true)
+      {
+        Alert(
+          context: context,
+          title: 'Finished',
+          desc: 'You have reached end of the quiz',
+        ).show();
+
+        quizBrain.reset();
+
+        scoreKeeper = [];
+      }
+      else {
+        if (userPickedAnswer == correctAnswer) {
+          //print('sahi jawab');
+          scoreKeeper.add(Icon(Icons.check, color: Colors.green,));
+        } else {
+          //print('wrong');
+          scoreKeeper.add(Icon(Icons.close, color: Colors.red,
+          ));
+        }
+      }
+
+      quizBrain.nextQuestionNumber();
+    });
+
+  }
 
 
-  static int questionNumber = 0;
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +105,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                 quizBrain.getQuestionText(questionNumber),
+                 quizBrain.getQuestionText(),
               //   quizBrain.questionBank[questionNumber].questiontext,
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -93,29 +133,12 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   color: Colors.teal,
                   onPressed: () {
-                    setState(() {
 
-                     if(questionNumber < 2)
-                       {
-                         questionNumber++;
-
-                       }
-                     return questionNumber;
-
-
-                    });
-
+                    checkAnswer(true);
 
                     //bool correctAnswer = quizBrain.questionBank[questionNumber].answer;
 
-                    bool correctAnswer = quizBrain.getQuestionAnswerTrue(questionNumber);
                     //the above function is declared in quizbrain class this is encapsulation
-
-                    if (correctAnswer == true) {
-                      print('sahi jawab');
-                    } else {
-                      print('wrong');
-                    }
                   },
                 ),
               ),
@@ -133,20 +156,12 @@ class _QuizPageState extends State<QuizPage> {
                     ),
                     color: Colors.red,
                     onPressed: () {
-                    //  bool correctAnswer = quizBrain.questionBank[questionNumber].answer;
-                    bool correctAnswer = quizBrain.getQuestionAnswerFalse(questionNumber);
 
-                      if (correctAnswer == false) {
-                        print('sahi jawab');
-                        }
-                      else
-                        {
-                        print('wrong');
-                        }
-                      setState(() {
-                        while(questionNumber!=2)
-                        questionNumber++;
-                      });
+                      checkAnswer(false);
+
+
+                    //  bool correctAnswer = quizBrain.questionBank[questionNumber].answer;
+
                     },
                   )),
             ),
